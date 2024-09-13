@@ -9,10 +9,10 @@ import AgoraRTC, {
 import { VideoPlayer } from "./VideoPlayer";
 
 // Constants for Agora
-const APP_ID = "a19fb1008eba457d89903c2db1098386";
+const APP_ID = "55e91d89a1db488c97f399d0b8aa8786";
 const TOKEN =
-  "007eJxTYHCUWFH4Jl/uCIPs+xs737ydpW/Ka1csYNseK/5t/aonLk8VGBINLdOSDA0MLFKTEk1MzVMsLC0NjJONUoBilhbGFmZ71j5OawhkZDjNzsTIyACBID4zQ15iLgMDABaYHpc=";
-const CHANNEL = "nam";
+  "007eJxTYHirmsI3o9t6QcZZU2Gj4huW853XcRbnfbgRMm0no3vi+40KDKamqZaGKRaWiYYpSSYWFsmW5mnGlpYpBkkWiYkW5hZmXZGP0hoCGRkyqjYzMzJAIIjPzZCbmJehUJxaVJZaxMAAAPINIao=";
+const CHANNEL = "manh server";
 
 // Agora Client Initialization
 const client: IAgoraRTCClient = AgoraRTC.createClient({
@@ -39,18 +39,11 @@ export const VideoRoom: React.FC = () => {
     await client.subscribe(user, mediaType);
 
     if (mediaType === "video" && user.videoTrack) {
-      setUsers((previousUsers) => [
-        ...previousUsers,
-        { ...user, videoTrack: user.videoTrack },
-      ]);
+      setUsers((previousUsers) => [...previousUsers, user]);
     }
 
     if (mediaType === "audio" && user.audioTrack) {
-      user.audioTrack.play();
-      setUsers((previousUsers) => [
-        ...previousUsers,
-        { ...user, audioTrack: user.audioTrack },
-      ]);
+      user.audioTrack.play(); // Optionally play audio if required
     }
   };
 
@@ -62,44 +55,41 @@ export const VideoRoom: React.FC = () => {
   };
 
   useEffect(() => {
-    const joinAndPublish = async () => {
-      // Register event listeners
-      client.on("user-published", handleUserJoined);
-      client.on("user-left", handleUserLeft);
+    // Register event listeners
+    client.on("user-published", handleUserJoined);
+    client.on("user-left", handleUserLeft);
 
-      // Join the Agora channel and create local tracks
-      const uid = await client.join(APP_ID, CHANNEL, TOKEN, null);
-      const [audioTrack, videoTrack] =
-        await AgoraRTC.createMicrophoneAndCameraTracks();
-      setLocalTracks([audioTrack, videoTrack]);
-
-      // Add local user to the state
-      setUsers((previousUsers) => [
-        ...previousUsers,
-        {
-          uid,
-          videoTrack,
-          audioTrack,
-        },
-      ]);
-
-      // Publish local tracks
-      await client.publish([audioTrack, videoTrack]);
-    };
-
-    joinAndPublish();
+    // Join the Agora channel and publish local tracks
+    client
+      .join(APP_ID, CHANNEL, TOKEN, null)
+      .then((uid) =>
+        Promise.all([AgoraRTC.createMicrophoneAndCameraTracks(), uid])
+      )
+      .then(([tracks, uid]) => {
+        const [audioTrack, videoTrack] = tracks;
+        setLocalTracks(tracks);
+        setUsers((previousUsers) => [
+          ...previousUsers,
+          {
+            uid,
+            videoTrack,
+            audioTrack,
+          },
+        ]);
+        client.publish(tracks);
+      });
 
     return () => {
       // Clean up when leaving the component
-      localTracks.forEach((track) => {
-        track.stop();
-        track.close();
-      });
+      for (const localTrack of localTracks) {
+        localTrack.stop();
+        localTrack.close();
+      }
       client.off("user-published", handleUserJoined);
       client.off("user-left", handleUserLeft);
       client.unpublish(localTracks).then(() => client.leave());
     };
-  }, []);
+  }, [localTracks]);
 
   return (
     <div style={{ display: "flex", justifyContent: "center" }}>
