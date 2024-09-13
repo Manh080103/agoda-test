@@ -10,7 +10,15 @@ function App() {
 
       {!joined && <button onClick={() => setJoined(true)}>Join Room</button>}
 
-      {joined && <VideoRoom />}
+      {joined && (
+        <>
+          <button onClick={() => setJoined(false)}>
+            To Lobby
+          </button>
+          <VideoRoom />
+        </>
+      )}
+
     </div>
   );
 }
