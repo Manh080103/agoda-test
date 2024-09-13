@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import { VideoRoom } from "./components/VideoRoom";
+// import ChannelForm from "./components/ChannelForm";
 
 function App() {
   const [joined, setJoined] = useState(false);
@@ -10,7 +11,16 @@ function App() {
 
       {!joined && <button onClick={() => setJoined(true)}>Join Room</button>}
 
-      {joined && <VideoRoom />}
+      {joined && (
+        <>
+          <button onClick={() => setJoined(false)}>
+            To Lobby
+          </button>
+          <VideoRoom />
+        </>
+      )}
+
+      {/* <ChannelForm /> */}
     </div>
   );
 }
