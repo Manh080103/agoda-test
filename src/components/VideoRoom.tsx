@@ -7,7 +7,7 @@ import AgoraRTC, {
   IAgoraRTCRemoteUser,
 } from "agora-rtc-sdk-ng";
 import { VideoPlayer } from "./VideoPlayer";
-import { CreateRoom } from "./CreateRoom";
+// import { CreateRoom } from "./CreateRoom";
 import { RoomList } from "./RoomList";
 
 // Constants for Agora
@@ -59,7 +59,7 @@ export const VideoRoom: React.FC = () => {
 
     if (mediaType === "audio" && user.audioTrack) {
       user.audioTrack.play();
-      captureAudioStream(user.audioTrack)
+      // captureAudioStream(user.audioTrack)
       setUsers((previousUsers) => [
         ...previousUsers.filter((u) => u.uid !== user.uid),
         { ...user, audioTrack: user.audioTrack },
@@ -74,30 +74,30 @@ export const VideoRoom: React.FC = () => {
     );
   };
 
-  const captureAudioStream = (audioTrack: IRemoteAudioTrack) => {
-    // Create an AudioContext for capturing the audio stream
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  // const captureAudioStream = (audioTrack: IRemoteAudioTrack) => {
+  //   // Create an AudioContext for capturing the audio stream
+  //   const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     
-    // Create a media stream source from the Agora audio track
-    const mediaStream = new MediaStream([audioTrack.getMediaStreamTrack()]);
-    const mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
+  //   // Create a media stream source from the Agora audio track
+  //   const mediaStream = new MediaStream([audioTrack.getMediaStreamTrack()]);
+  //   const mediaStreamSource = audioContext.createMediaStreamSource(mediaStream);
   
-    // Connect the audio to the destination (playback)
-    mediaStreamSource.connect(audioContext.destination);
+  //   // Connect the audio to the destination (playback)
+  //   mediaStreamSource.connect(audioContext.destination);
   
-    // Now you can analyze the audio stream or process it further
-    // For example, create an analyser node to capture audio data for speech-to-text
-    const analyser = audioContext.createAnalyser();
-    mediaStreamSource.connect(analyser);
+  //   // Now you can analyze the audio stream or process it further
+  //   // For example, create an analyser node to capture audio data for speech-to-text
+  //   const analyser = audioContext.createAnalyser();
+  //   mediaStreamSource.connect(analyser);
   
-    // This is just an example of capturing audio data
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(dataArray);
+  //   // This is just an example of capturing audio data
+  //   const dataArray = new Uint8Array(analyser.frequencyBinCount);
+  //   analyser.getByteFrequencyData(dataArray);
   
-    // You can send the audio data to a speech-to-text service here
-    // For now, we just log that the audio is being captured
-    console.log("Capturing audio stream...");
-  };
+  //   // You can send the audio data to a speech-to-text service here
+  //   // For now, we just log that the audio is being captured
+  //   console.log("Capturing audio stream...");
+  // };
   
 
   const joinRoom = async (channel: string) => {
